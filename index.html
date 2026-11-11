@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14213d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rock Quad">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Rock Quad</title>
+<style>
+:root{
+  --navy:#14213d;--orange:#f07f1b;--ink:#1b1f2a;--muted:#5d6577;--line:#e3e6ec;--bg:#f6f4f0;--card:#fff;--soft:#f1f3f7;
+  --green:#1f8a4c;--green-soft:#e5f5ec;--red:#c2402b;--red-soft:#fbe9e5;--blue:#2b5fc2;--blue-soft:#e6eefc;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg)}
+body{font-family:-apple-system,"SF Pro Text","SF Arabic","Geeza Pro",system-ui,"Segoe UI",Tahoma,sans-serif;color:var(--ink);font-size:16px;line-height:1.4;overscroll-behavior:none}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto;background:var(--bg)}
+.head{background:var(--navy);color:#fff;padding:calc(var(--st) + 10px) 18px 14px;flex:none;position:relative}
+.head .t{font-size:24px;font-weight:800}
+.head .s{font-size:13.5px;color:#aeb8cf;margin-top:1px}
+.head .back{background:none;border:none;color:var(--orange);font:inherit;font-weight:700;padding:0 0 4px;cursor:pointer}
+.head .act{position:absolute;inset-inline-end:14px;top:calc(var(--st) + 10px);background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 12px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(110px + var(--sb))}
+.tabbar{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:var(--sb);z-index:3}
+.tabbar button{flex:1;height:60px;background:none;border:none;font:inherit;font-size:11.5px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+.tabbar button .i{font-size:21px;line-height:1}
+.tabbar button.on{color:var(--orange)}
+.fab{position:absolute;inset-inline-end:16px;bottom:calc(74px + var(--sb));background:var(--orange);color:#fff;border:none;border-radius:30px;padding:15px 22px;font:inherit;font-weight:800;font-size:17px;box-shadow:0 6px 16px rgba(240,127,27,.45);cursor:pointer;z-index:2}
+.box{background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line)}
+.lbl{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.money{display:flex;gap:8px;margin-top:6px}
+.money div{flex:1;background:var(--soft);border-radius:10px;padding:7px 9px;min-width:0}
+.money small{display:block;font-size:11.5px;color:var(--muted);font-weight:700}
+.money b{font-size:18px;font-variant-numeric:tabular-nums}
+.sec{font-size:13px;font-weight:800;color:var(--muted);margin:16px 2px 8px}
+.item{background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:9px;border:1px solid var(--line);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.item .n{font-weight:700}
+.d{font-size:13.5px;color:var(--muted)}
+.pill{font-size:12px;font-weight:700;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.pill.ok{background:var(--green-soft);color:var(--green)}
+.pill.due{background:var(--red-soft);color:var(--red)}
+.pill.dig{background:var(--blue-soft);color:var(--blue)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:10px}
+.row:last-child{border-bottom:none}
+.amt{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;direction:ltr}
+.in{color:var(--green)}.out{color:var(--red)}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:15px;font:inherit;font-weight:800;font-size:17px;cursor:pointer;margin-top:10px}
+.btn.pri{background:var(--orange);color:#fff}
+.btn.sec2{background:#fff;color:var(--navy);border:1.5px solid var(--line)}
+.btn.wa{background:#25d366;color:#fff}
+.btn.danger{background:#fff;color:var(--red);border:1.5px solid var(--red-soft)}
+.btn.sm{display:inline-block;width:auto;padding:8px 13px;font-size:14px;margin:0;border-radius:10px}
+.banner{border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:600;font-size:14.5px}
+.banner.warn{background:#fff4e5;color:#8a4b08;border:1px solid #f6d3a8}
+.banner.okb{background:var(--green-soft);color:var(--green);border:1px solid #bfe5cf}
+.overlay{position:absolute;inset:0;background:rgba(10,15,30,.45);display:flex;align-items:flex-end;z-index:10}
+.sheet{background:var(--bg);width:100%;max-height:92%;overflow-y:auto;border-radius:22px 22px 0 0;padding:10px 16px calc(22px + var(--sb))}
+.grab{width:40px;height:5px;background:#c8ccd5;border-radius:3px;margin:0 auto 10px}
+.sheet h4{margin:2px 0 12px;font-size:20px}
+.field{margin-bottom:13px}
+.field>label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:9px 14px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.stepper{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:4px;width:max-content}
+.stepper button{width:44px;height:44px;border-radius:10px;border:none;background:var(--soft);font-size:24px;font-weight:700;cursor:pointer;color:var(--navy)}
+.stepper span{min-width:30px;text-align:center;font-weight:800;font-size:19px}
+.inp{width:100%;font:inherit;font-size:18px;font-weight:600;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+.inp.big{font-size:26px;font-weight:800;direction:ltr;text-align:center}
+textarea.inp{font-size:15px;font-weight:500;min-height:80px}
+.seg{display:flex;background:#e6e9ef;border-radius:12px;padding:3px}
+.seg button{flex:1;border:none;background:none;font:inherit;font-weight:700;padding:11px 4px;border-radius:10px;cursor:pointer;color:var(--muted);font-size:15px}
+.seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.flexrow{display:flex;gap:14px;flex-wrap:wrap}
+.toast{position:absolute;left:16px;right:16px;bottom:calc(84px + var(--sb));background:var(--navy);color:#fff;border-radius:12px;padding:12px 14px;font-size:15px;z-index:20;text-align:center}
+.modal{position:absolute;inset:0;background:rgba(10,15,30,.5);display:flex;align-items:center;justify-content:center;z-index:30;padding:24px}
+.modal div.c{background:#fff;border-radius:18px;padding:18px;width:100%;max-width:360px}
+.modal p{margin:0 0 6px;font-size:16.5px;font-weight:600}
+.wabubble{background:#d9fdd3;border-radius:12px;padding:11px 12px;font-size:14.5px;white-space:pre-wrap;line-height:1.5;unicode-bidi:plaintext}
+.photo{max-width:100%;border-radius:10px;margin-top:8px;display:block}
+.countrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.countrow:last-child{border-bottom:none}
+.countrow .inp{width:120px;font-size:18px;padding:9px;direction:ltr;text-align:center}
+.diff0{color:var(--green);font-weight:800}.diffx{color:var(--red);font-weight:800}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+a.lnk{color:var(--blue)}
+</style>
+</head>
+<body>
+<div id="err" style="display:none;position:fixed;left:0;right:0;top:0;z-index:99;background:#c2402b;color:#fff;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 12px;font:14px/1.4 -apple-system,system-ui,sans-serif;direction:ltr;text-align:left;white-space:pre-wrap"></div>
+<div id="app"></div>
+<input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
+<input type="file" id="restoreIn" hidden>
+<script>
+window.addEventListener('error',function(e){var d=document.getElementById('err');if(!d)return;d.style.display='block';d.textContent='Error: '+(e.message||e.error)+(e.lineno?' (line '+e.lineno+')':'')+'\nPlease send a screenshot of this to Cryptic.';});
+window.addEventListener('unhandledrejection',function(e){var d=document.getElementById('err');if(!d)return;d.style.display='block';d.textContent='Error: '+(e.reason&&e.reason.message||e.reason)+'\nPlease send a screenshot of this to Cryptic.';});
+(function(){
+'use strict';
+const VERSION='1.0.1';
+const REPORT_TPL="<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Rock Quad monthly report<\/title>\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n:root{--navy:#14213d;--orange:#f07f1b;--ink:#1b1f2a;--muted:#5d6577;--line:#e3e6ec;--bg:#f6f4f0;--card:#fff;--soft:#f1f3f7;\n  --green:#1f8a4c;--green-soft:#e5f5ec;--red:#c2402b;--red-soft:#fbe9e5;--bar-in:#2f9e63;--bar-out:#e0703a}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);line-height:1.45;font-size:15px}\nbody.ar{font-family:'IBM Plex Sans Arabic',Inter,sans-serif}\nheader{background:var(--navy);color:#fff;padding:22px 16px 18px}\n.wrap{max-width:1100px;margin:0 auto;padding:0 16px}\nheader .wrap{padding:0}\n.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}\n.kicker{color:var(--orange);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase}\nbody.ar .kicker{letter-spacing:0}\nh1{margin:4px 0 4px;font-size:28px;font-weight:800}\nheader p{margin:0;color:#c3cbe0;font-size:13px}\n.lang{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:99px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer}\n.backup{margin-top:14px;background:rgba(240,127,27,.15);border:1px solid rgba(240,127,27,.45);border-radius:12px;padding:10px 12px;font-size:13px;color:#ffe2c6}\nh2{font-size:18px;margin:28px 0 10px;font-weight:800}\n.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:18px}\n.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}\n.kpi small{display:block;color:var(--muted);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em}\nbody.ar .kpi small{letter-spacing:0}\n.kpi b{display:block;font-size:22px;font-weight:800;margin-top:2px}\n.kpi span{font-size:12.5px;color:var(--muted)}\n.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}\n.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}\n@media(max-width:800px){.grid2{grid-template-columns:1fr}}\n.chart{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:170px;padding-top:6px;direction:ltr}\n.day{flex:1;min-width:0;max-width:44px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;height:100%;position:relative;border-radius:4px}\n.day:hover,.day.on{background:var(--soft)}\n.day .pair{display:flex;gap:1px;align-items:flex-end;width:100%;justify-content:center;flex:1}\n.day i{display:block;width:45%;border-radius:2px 2px 0 0}\n.day i.in{background:var(--bar-in)}.day i.out{background:var(--bar-out)}\n.day em{font-style:normal;font-size:9.5px;line-height:1.2;color:var(--muted);margin-top:2px}\n.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:8px;flex-wrap:wrap}\n.legend b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:5px;vertical-align:-1px}\n.hbar{display:grid;grid-template-columns:130px 1fr auto;gap:8px;align-items:center;padding:5px 4px;border-radius:8px;cursor:pointer;font-size:14px}\n.hbar:hover,.hbar.on{background:var(--soft)}\n.hbar .track{height:12px;background:var(--soft);border-radius:6px;overflow:hidden}\n.hbar .fill{height:100%;background:var(--bar-out);border-radius:6px}\n.hbar .v{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}\ntable{width:100%;border-collapse:collapse;font-size:13.5px}\nth,td{text-align:start;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top}\nth{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;user-select:none}\nbody.ar th{letter-spacing:0}\ntd.n,th.n{text-align:end;font-variant-numeric:tabular-nums;white-space:nowrap}\ntr.in td.amt{color:var(--green);font-weight:700}tr.out td.amt{color:var(--red);font-weight:700}\n.tablewrap{overflow-x:auto}\n.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}\nselect,input[type=search]{font:inherit;font-size:14px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}\ninput[type=search]{flex:1;min-width:160px}\n.chip{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border-radius:99px;padding:5px 10px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit}\n.sum{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px;padding:10px 4px 0;color:var(--muted)}\n.sum b{color:var(--ink)}\n.pill{font-size:11.5px;font-weight:700;border-radius:99px;padding:2px 8px;white-space:nowrap}\n.pill.ok{background:var(--green-soft);color:var(--green)}.pill.bad{background:var(--red-soft);color:var(--red)}\n.muted{color:var(--muted)}\n.more{display:block;margin:10px auto 0;font:inherit;font-weight:700;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px 16px;cursor:pointer}\n@media(max-width:600px){.day em{font-size:8px}.day:nth-child(even) em{visibility:hidden}.chart{gap:1px}td.who,th.who{display:none}.whoIn{display:block!important}.hbar{grid-template-columns:105px 1fr auto}}\n.whoIn{display:none;color:var(--muted)}\nfooter{color:var(--muted);font-size:12.5px;padding:30px 16px 50px;text-align:center}\n<\/style>\n<\/head>\n<body>\n<header><div class=\"wrap\">\n  <div class=\"top\">\n    <div>\n      <div class=\"kicker\" data-t=\"kicker\">Rock Quad · Monthly report<\/div>\n      <h1 id=\"title\"><\/h1>\n      <p id=\"gen\"><\/p>\n    <\/div>\n    <button class=\"lang\" id=\"langBtn\">عربي<\/button>\n  <\/div>\n  <div class=\"backup\" data-t=\"backup\">This file is also the full backup of the month. To restore it, open the Rock Quad app, then History › Restore, and pick this file.<\/div>\n<\/div><\/header>\n\n<div class=\"wrap\">\n  <div class=\"kpis\" id=\"kpis\"><\/div>\n\n  <h2 data-t=\"hDaily\">Every day: money in and money out<\/h2>\n  <div class=\"card\">\n    <div class=\"chart\" id=\"chart\"><\/div>\n    <div class=\"legend\"><span><b style=\"background:var(--bar-in)\"><\/b><span data-t=\"lgIn\">Money in (in EGP)<\/span><\/span><span><b style=\"background:var(--bar-out)\"><\/b><span data-t=\"lgOut\">Money out (in EGP)<\/span><\/span><span data-t=\"lgTip\">Tap a day to see only that day below.<\/span><\/div>\n  <\/div>\n\n  <div class=\"grid2\">\n    <div><h2 data-t=\"hExp\">Expenses by type<\/h2><div class=\"card\" id=\"cats\"><\/div><\/div>\n    <div><h2 data-t=\"hPeople\">Guides, helpers and referrers<\/h2><div class=\"card\" id=\"people\"><\/div><\/div>\n  <\/div>\n\n  <h2 data-t=\"hAll\">Every entry this month<\/h2>\n  <div class=\"card\">\n    <div class=\"filters\">\n      <input type=\"search\" id=\"q\" data-tp=\"search\" placeholder=\"Search names, notes, parts…\">\n      <select id=\"fType\"><\/select>\n      <select id=\"fCat\"><\/select>\n      <select id=\"fCur\"><\/select>\n      <span id=\"activeChips\"><\/span>\n    <\/div>\n    <div class=\"tablewrap\"><table>\n      <thead><tr>\n        <th data-k=\"day\" data-t=\"cDate\">Date<\/th><th data-k=\"kind\" data-t=\"cWhat\">What<\/th><th data-k=\"detail\" data-t=\"cDetail\">Details<\/th><th data-k=\"who\" class=\"who\" data-t=\"cWho\">Person<\/th><th data-k=\"egp\" class=\"n\" data-t=\"cAmt\">Amount<\/th>\n      <\/tr><\/thead>\n      <tbody id=\"rows\"><\/tbody>\n    <\/table><\/div>\n    <button class=\"more\" id=\"more\" data-t=\"more\">Show more<\/button>\n    <div class=\"sum\" id=\"sum\"><\/div>\n  <\/div>\n\n  <h2 data-t=\"hTrips\">Trips<\/h2>\n  <div class=\"card tablewrap\"><table>\n    <thead><tr><th data-t=\"cDate\">Date<\/th><th data-t=\"cTrip\">Trip<\/th><th data-t=\"cGuide\">Guide<\/th><th class=\"n\" data-t=\"cGuests\">Guests<\/th><th class=\"n\" data-t=\"cBikes\">Bikes<\/th><th class=\"n\" data-t=\"cIncome\">Income<\/th><th class=\"n\" data-t=\"cCosts\">Trip costs<\/th><\/tr><\/thead>\n    <tbody id=\"trips\"><\/tbody>\n  <\/table><\/div>\n\n  <h2 data-t=\"hClose\">Daily cash count<\/h2>\n  <div class=\"card tablewrap\"><table>\n    <thead><tr><th data-t=\"cDate\">Date<\/th><th class=\"n\" data-t=\"cExpected\">Expected<\/th><th class=\"n\" data-t=\"cCounted\">Counted<\/th><th class=\"n\" data-t=\"cDiff\">Difference<\/th><th data-t=\"cBy\">Closed by<\/th><\/tr><\/thead>\n    <tbody id=\"closes\"><\/tbody>\n  <\/table><\/div>\n<\/div>\n<footer id=\"foot\"><\/footer>\n\n<script type=\"application/json\" id=\"ledger-data\">/*DATA*/<\/script>\n<script>\n(function(){\nconst D=JSON.parse(document.getElementById('ledger-data').textContent);\nconst CUR=['EGP','USD','EUR'];\nconst AR={\n  ownerNote:'للبنك / الخزنة، ليس مصروفاً',kicker:'روك كواد · التقرير الشهري',backup:'هذا الملف هو أيضاً النسخة الاحتياطية الكاملة للشهر. لاسترجاعه افتح تطبيق روك كواد ثم السجل › استرجاع واختر هذا الملف.',\n  hDaily:'كل يوم: الوارد والمنصرف',lgIn:'الوارد (بالجنيه)',lgOut:'المنصرف (بالجنيه)',lgTip:'اضغط على يوم لعرض تفاصيله فقط بالأسفل.',\n  hExp:'المصروفات حسب النوع',hPeople:'المرشدين والمساعدين والمندوبين',hAll:'كل الحركات في الشهر',search:'ابحث بالاسم أو الملاحظة أو قطعة الغيار…',\n  cDate:'التاريخ',cWhat:'البند',cDetail:'التفاصيل',cWho:'الشخص',cAmt:'المبلغ',more:'عرض المزيد',hTrips:'الرحلات',cTrip:'الرحلة',cGuide:'المرشد',cGuests:'الضيوف',cBikes:'الباجي',cIncome:'الدخل',cCosts:'تكاليف الرحلة',\n  hClose:'جرد الدرج اليومي',cExpected:'المتوقع',cCounted:'المعدود',cDiff:'الفرق',cBy:'التقفيل بواسطة',\n  allTypes:'الوارد والمنصرف',inOnly:'الوارد فقط',outOnly:'المنصرف فقط',allCats:'كل البنود',allCur:'كل العملات',\n  kTrips:'الرحلات',kGuests:'الضيوف',kIn:'الوارد',kOut:'المنصرف',kNet:'الصافي',kEgp:'بالجنيه تقريباً',kBikes:'باجي',kDays:'أيام عمل',kOwed:'مبالغ متبقية',\n  rows:'حركة',totalIn:'الوارد',totalOut:'المنصرف',net:'الصافي',ok:'مظبوط',guestPay:'دفع ضيوف',\n  generated:'تاريخ الإنشاء',rates:'أسعار الصرف',month:'أكتوبر 2026',guidesH:'المرشد / المساعد',refH:'المندوب / الجهة',trips:'رحلات',guests:'ضيوف',paid:'مدفوع',unpaid:'غير مدفوع',\n  Fuel:'بنزين','Spare parts':'قطع غيار','Repairs & service':'صيانة وتصليح','Guide fee':'أجرة المرشد','Helper fee':'أجرة المساعد',Commission:'عمولة','Camp & tea':'الكامب والشاي','Water & snacks':'مياه وسناكس','Bike wash':'غسيل الباجي','Permits & fees':'تصاريح ورسوم','Owner takes cash':'سحب المالك',\n  Sunrise:'الشروق',Morning:'الصباح',Sunset:'الغروب',Night:'الليل',Canyon:'الكانيون','Bedouin village':'قرية بدوية',Mountain:'الجبل',Lagoon:'اللاجون',\n  EGP:'جنيه',USD:'دولار',EUR:'يورو',cash:'كاش',instapay:'انستاباي',ewallet:'محفظة',footReal:'تم إنشاؤه بواسطة تطبيق روك كواد.','Other':'أخرى',foot:'تم إنشاؤه بواسطة تطبيق روك كواد. بيانات مثال للعرض فقط.'\n};\nlet LANG=D.lang==='ar'?'ar':'en';\nconst t=(k,en)=>LANG==='ar'&&AR[k]!=null?AR[k]:(en!=null?en:k);\nconst fmt=n=>Math.round(n).toLocaleString('en-US');\nconst esc=s=>String(s==null?'':s).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));\nconst money=(c,n)=>LANG==='ar'?fmt(n)+' '+t(c):c+' '+fmt(n);\nconst egp=(c,n)=>n*(c==='EGP'?1:(+D.rates[c]||0));\nconst tripById={};D.trips.forEach(x=>tripById[x.id]=x);\nconst dayLabel=d=>{const dt=new Date(d+'T12:00:00');return dt.toLocaleDateString(LANG==='ar'?'ar-EG-u-nu-latn':'en-GB',{weekday:'short',day:'numeric',month:'short'});};\n\n// one flat list: guest payments + cash movements\nconst ROWS=[];\nD.groups.forEach(g=>{const tr=tripById[g.trip]||{day:g.paidDay,slot:'',route:'',guide:''};\n  ROWS.push({day:g.paidDay||tr.day,time:g.paidTime||g.time,dir:g.paidDay?'in':'owed',cat:'guest',amt:g.total,cur:g.cur,method:g.method,\n    detail:(g.name||'')+' · '+g.people+'p · '+(g.single?g.single+'×S ':'')+(g.double?g.double+'×D':'')+(g.note?' · '+g.note:''),tripRef:tr,who:g.ref&&g.ref!=='Walk-in'?g.ref:'',egp:egp(g.cur,g.total)});});\nD.cash.forEach(c=>ROWS.push({day:c.day,time:c.time,dir:c.dir,cat:c.cat,amt:c.amt,cur:c.cur,method:c.method,detail:c.note||'',photo:c.photo,tripRef:c.trip?tripById[c.trip]:null,\n  who:c.person||'',egp:egp(c.cur,c.amt)}));\nROWS.sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time));\nconst CATS=[...new Set(D.cash.filter(c=>c.dir==='out').map(c=>c.cat))];\n\nconst F={q:'',type:'',cat:'',cur:'',day:'',who:''};let SORT={k:'day',asc:true};let LIMIT=60;\n\nfunction sums(rows){const i={EGP:0,USD:0,EUR:0},o={EGP:0,USD:0,EUR:0};let ie=0,oe=0;\n  rows.forEach(r=>{if(r.dir==='in'){i[r.cur]+=r.amt;ie+=r.egp}else if(r.dir==='out'){o[r.cur]+=r.amt;oe+=r.egp}});return {i,o,ie,oe};}\nconst curLine=o=>CUR.filter(c=>o[c]).map(c=>money(c,o[c])).join(' · ')||'0';\n\nfunction kpis(){\n  const s=sums(ROWS.filter(r=>r.cat!=='Owner takes cash'));\n  const guests=D.groups.reduce((a,g)=>a+g.people,0),bikes=D.groups.reduce((a,g)=>a+g.single+g.double,0);\n  const owed=ROWS.filter(r=>r.dir==='owed');const ow={EGP:0,USD:0,EUR:0};owed.forEach(r=>ow[r.cur]+=r.amt);\n  const k=(lbl,val,sub)=>'<div class=\"kpi\"><small>'+lbl+'<\/small><b>'+val+'<\/b><span>'+sub+'<\/span><\/div>';\n  document.getElementById('kpis').innerHTML=\n    k(t('kTrips','Trips'),D.trips.length,D.closes.length+' '+t('kDays','working days'))+\n    k(t('kGuests','Guests'),fmt(guests),fmt(bikes)+' '+t('kBikes','bikes'))+\n    k(t('kIn','Money in'),money('EGP',s.ie),curLine(s.i)+'<br>'+['cash','instapay','ewallet'].map(m=>{const o={EGP:0,USD:0,EUR:0};ROWS.forEach(r=>{if(r.dir==='in'&&(r.method||'cash')===m)o[r.cur]+=r.amt});return CUR.some(c=>o[c])?t(m)+': '+curLine(o):''}).filter(Boolean).join('<br>'))+\n    k(t('kOut','Money out'),money('EGP',s.oe),t('kEgp','EGP equivalent')+(LANG==='ar'?'، بدون سحب المالك':', without owner cash'))+\n    k(t('kNet','Net'),money('EGP',s.ie-s.oe),t('kEgp','EGP equivalent'))+\n    k(t('kOwed','Still owed'),owed.length?curLine(ow):'0',owed.length+(LANG==='ar'?' مجموعة':' groups'));\n}\nfunction chart(){\n  const days=[...new Set(D.closes.map(c=>c.day).concat(ROWS.map(r=>r.day)).filter(Boolean))].sort();const per={};days.forEach(d=>per[d]={i:0,o:0});\n  ROWS.forEach(r=>{if(r.cat==='Owner takes cash')return;if(r.dir==='in')per[r.day].i+=r.egp;else if(r.dir==='out')per[r.day].o+=r.egp;});\n  const max=Math.max(1,...days.map(d=>Math.max(per[d].i,per[d].o)));\n  document.getElementById('chart').innerHTML=days.map(d=>'<div class=\"day'+(F.day===d?' on':'')+'\" data-d=\"'+d+'\" title=\"'+dayLabel(d)+': +'+fmt(per[d].i)+' / −'+fmt(per[d].o)+' EGP\"><div class=\"pair\"><i class=\"in\" style=\"height:'+(per[d].i/max*100)+'%\"><\/i><i class=\"out\" style=\"height:'+(per[d].o/max*100)+'%\"><\/i><\/div><em>'+(+d.slice(8))+'<\/em><\/div>').join('');\n  document.querySelectorAll('.day').forEach(el=>el.onclick=()=>{F.day=F.day===el.dataset.d?'':el.dataset.d;LIMIT=60;draw();document.getElementById('q').scrollIntoView({behavior:'smooth',block:'center'});});\n}\nfunction cats(){\n  const tot={};CATS.forEach(c=>tot[c]=0);ROWS.forEach(r=>{if(r.dir==='out')tot[r.cat]+=r.egp});\n  const list=CATS.filter(c=>c!=='Owner takes cash').sort((a,b)=>tot[b]-tot[a]);const max=Math.max(1,...list.map(c=>tot[c]));\n  document.getElementById('cats').innerHTML=list.map(c=>'<div class=\"hbar'+(F.cat===c?' on':'')+'\" data-c=\"'+c+'\"><span>'+t(c)+'<\/span><div class=\"track\"><div class=\"fill\" style=\"width:'+(tot[c]/max*100)+'%;'+(c==='Owner takes cash'?'background:#9aa3b5':'')+'\"><\/div><\/div><span class=\"v\">'+money('EGP',tot[c])+'<\/span><\/div>').join('')+\n    '<div class=\"hbar'+(F.cat==='Owner takes cash'?' on':'')+'\" data-c=\"Owner takes cash\" style=\"margin-top:8px;border-top:1px solid var(--line);border-radius:0;padding-top:10px\"><span>'+t('Owner takes cash')+'<\/span><span class=\"muted\" style=\"font-size:12.5px\">'+t('ownerNote','To bank / safe, not a cost')+'<\/span><span class=\"v\">'+money('EGP',tot['Owner takes cash'])+'<\/span><\/div>';\n  if(!CATS.includes('Owner takes cash'))document.getElementById('cats').lastElementChild.remove();\n  document.querySelectorAll('.hbar[data-c]').forEach(el=>el.onclick=()=>{F.cat=F.cat===el.dataset.c?'':el.dataset.c;F.type=F.cat?'out':F.type;LIMIT=60;draw();});\n}\nfunction people(){\n  const P={};const add=(name,role,k,v)=>{P[name]=P[name]||{name,role,trips:0,guests:0,paid:0};P[name][k]+=v;};\n  D.trips.forEach(x=>{if(x.guide)add(x.guide,'guide','trips',1);if(x.helper)add(x.helper,'helper','trips',1);});\n  D.cash.forEach(c=>{if(['Guide fee','Helper fee','Commission'].includes(c.cat)&&c.person)add(c.person,c.cat==='Commission'?'ref':(c.cat==='Guide fee'?'guide':'helper'),'paid',c.amt);});\n  D.groups.forEach(g=>{if(g.ref&&g.ref!=='Walk-in')add(g.ref,'ref','guests',g.people);});\n  const row=p=>'<tr class=\"pr'+(F.who===p.name?' on':'')+'\" data-w=\"'+esc(p.name)+'\" style=\"cursor:pointer'+(F.who===p.name?';background:var(--soft)':'')+'\"><td><b>'+esc(p.name)+'<\/b><\/td><td class=\"n\">'+(p.role==='ref'?p.guests+' '+t('guests','guests'):p.trips+' '+t('trips','trips'))+'<\/td><td class=\"n\">'+money('EGP',p.paid)+'<\/td><\/tr>';\n  const g=Object.values(P).filter(p=>p.role!=='ref'),r=Object.values(P).filter(p=>p.role==='ref');\n  document.getElementById('people').innerHTML='<table><thead><tr><th>'+t('guidesH','Guide / helper')+'<\/th><th class=\"n\"><\/th><th class=\"n\">'+t('paid','Paid')+'<\/th><\/tr><\/thead><tbody>'+g.map(row).join('')+'<\/tbody><\/table>'+\n    '<table style=\"margin-top:10px\"><thead><tr><th>'+t('refH','Referrer')+'<\/th><th class=\"n\"><\/th><th class=\"n\">'+t('Commission')+'<\/th><\/tr><\/thead><tbody>'+r.map(row).join('')+'<\/tbody><\/table>';\n  document.querySelectorAll('tr.pr').forEach(el=>el.onclick=()=>{F.who=F.who===el.dataset.w?'':el.dataset.w;LIMIT=60;draw();});\n}\nfunction filtered(){\n  const q=F.q.toLowerCase();\n  return ROWS.filter(r=>(!F.type||r.dir===F.type)&&(!F.cat||r.cat===F.cat)&&(!F.cur||r.cur===F.cur)&&(!F.day||r.day===F.day)&&\n    (!F.who||r.who===F.who||(r.tripRef&&(r.tripRef.guide===F.who||r.tripRef.helper===F.who)))&&\n    (!q||(r.detail+' '+r.who+' '+t(r.cat)+' '+r.cat+' '+(r.tripRef?r.tripRef.slot+' '+r.tripRef.route+' '+r.tripRef.guide:'')).toLowerCase().includes(q)));\n}\nfunction table(){\n  let rows=filtered();\n  const key={day:r=>r.day+r.time,kind:r=>r.cat,detail:r=>r.detail,who:r=>r.who||'',egp:r=>(r.dir==='out'?-1:1)*r.egp}[SORT.k];\n  rows.sort((a,b)=>{const x=key(a),y=key(b);return (x<y?-1:x>y?1:0)*(SORT.asc?1:-1)});\n  const meth=r=>r.method&&r.method!=='cash'?' <span class=\"pill\" style=\"background:#e6eefc;color:#2b5fc2\">'+t(r.method)+'<\/span>':'';\n  const kind=r=>r.cat==='guest'?(r.dir==='owed'?'<span class=\"pill bad\">'+t('unpaid','Unpaid')+'<\/span> ':'')+t('guestPay','Guest payment'):t(r.cat);\n  document.getElementById('rows').innerHTML=rows.slice(0,LIMIT).map(r=>'<tr class=\"'+r.dir+'\"><td style=\"white-space:nowrap\">'+dayLabel(r.day)+'<div class=\"muted\">'+r.time+'<\/div><\/td><td>'+kind(r)+meth(r)+'<\/td><td>'+esc(r.detail)+(r.photo?'<div><img src=\"'+r.photo+'\" style=\"max-width:120px;border-radius:6px;margin-top:4px;cursor:zoom-in\" onclick=\"this.style.maxWidth=this.style.maxWidth===\\'100%\\'?\\'120px\\':\\'100%\\'\"><\/div>':'')+(r.tripRef?'<div class=\"muted\">'+t(r.tripRef.slot)+' · '+t(r.tripRef.route)+'<\/div>':'')+(r.who?'<span class=\"whoIn\">👤 '+r.who+'<\/span>':'')+'<\/td><td class=\"who\">'+(r.who||'')+'<\/td><td class=\"n amt\">'+(r.dir==='out'?'−':r.dir==='in'?'+':'')+money(r.cur,r.amt)+(r.cur!=='EGP'?'<div class=\"muted\" style=\"font-weight:400\">≈ '+fmt(r.egp)+'<\/div>':'')+'<\/td><\/tr>').join('');\n  const m=document.getElementById('more');m.style.display=rows.length>LIMIT?'block':'none';\n  m.textContent=t('more','Show more')+' ('+(rows.length-LIMIT)+')';\n  const s=sums(rows);\n  document.getElementById('sum').innerHTML='<span><b>'+rows.length+'<\/b> '+t('rows','entries')+'<\/span><span>'+t('totalIn','In')+': <b style=\"color:var(--green)\">'+curLine(s.i)+'<\/b><\/span><span>'+t('totalOut','Out')+': <b style=\"color:var(--red)\">'+curLine(s.o)+'<\/b><\/span><span>'+t('net','Net')+' ≈ <b>'+money('EGP',s.ie-s.oe)+'<\/b><\/span>';\n  const chips=[];if(F.day)chips.push(['day',dayLabel(F.day)]);if(F.who)chips.push(['who',F.who]);\n  document.getElementById('activeChips').innerHTML=chips.map(([k,l])=>'<button class=\"chip\" data-k=\"'+k+'\">'+l+' ✕<\/button>').join(' ');\n  document.querySelectorAll('#activeChips .chip').forEach(el=>el.onclick=()=>{F[el.dataset.k]='';draw();});\n}\nfunction selects(){\n  const opt=(v,l,cur)=>'<option value=\"'+v+'\"'+(cur===v?' selected':'')+'>'+l+'<\/option>';\n  document.getElementById('fType').innerHTML=opt('',t('allTypes','In and out'),F.type)+opt('in',t('inOnly','Money in only'),F.type)+opt('out',t('outOnly','Money out only'),F.type)+opt('owed',t('unpaid','Unpaid'),F.type);\n  document.getElementById('fCat').innerHTML=opt('',t('allCats','All types'),F.cat)+opt('guest',t('guestPay','Guest payment'),F.cat)+CATS.map(c=>opt(c,t(c),F.cat)).join('');\n  document.getElementById('fCur').innerHTML=opt('',t('allCur','All currencies'),F.cur)+CUR.map(c=>opt(c,t(c),F.cur)).join('');\n}\nfunction trips(){\n  document.getElementById('trips').innerHTML=D.trips.map(x=>{const gs=D.groups.filter(g=>g.trip===x.id);const inc={EGP:0,USD:0,EUR:0};gs.forEach(g=>inc[g.cur]+=g.total);\n    const cost=D.cash.filter(c=>c.trip===x.id).reduce((a,c)=>a+egp(c.cur,c.amt),0);\n    return '<tr><td style=\"white-space:nowrap\">'+dayLabel(x.day)+'<\/td><td>'+x.time+' '+t(x.slot)+'<div class=\"muted\">'+t(x.route)+'<\/div><\/td><td>'+x.guide+(x.helper?'<div class=\"muted\">+ '+x.helper+'<\/div>':'')+'<\/td><td class=\"n\">'+gs.reduce((a,g)=>a+g.people,0)+'<\/td><td class=\"n\">'+gs.reduce((a,g)=>a+g.single+g.double,0)+'<\/td><td class=\"n\">'+curLine(inc)+'<\/td><td class=\"n\">'+money('EGP',cost)+'<\/td><\/tr>';}).join('');\n}\nfunction closes(){\n  document.getElementById('closes').innerHTML=D.closes.map(c=>{const d={};CUR.forEach(k=>d[k]=c.counted[k]-c.expected[k]);const bad=CUR.some(k=>d[k]);\n    return '<tr><td style=\"white-space:nowrap\">'+dayLabel(c.day)+'<\/td><td class=\"n\">'+curLine(c.expected)+'<\/td><td class=\"n\">'+curLine(c.counted)+'<\/td><td class=\"n\">'+(bad?'<span class=\"pill bad\">'+CUR.filter(k=>d[k]).map(k=>(d[k]>0?'+':'−')+money(k,Math.abs(d[k]))).join(' ')+'<\/span>':'<span class=\"pill ok\">'+t('ok','OK')+'<\/span>')+'<\/td><td>'+c.closedBy+' · '+c.closedAt+'<\/td><\/tr>';}).join('');\n}\nfunction statics(){\n  document.body.classList.toggle('ar',LANG==='ar');document.documentElement.dir=LANG==='ar'?'rtl':'ltr';document.documentElement.lang=LANG;\n  document.querySelectorAll('[data-t]').forEach(el=>{if(!el.dataset.en)el.dataset.en=el.textContent;el.textContent=t(el.dataset.t,el.dataset.en);});\n  document.querySelectorAll('[data-tp]').forEach(el=>{if(!el.dataset.en)el.dataset.en=el.placeholder;el.placeholder=t(el.dataset.tp,el.dataset.en);});\n  document.getElementById('title').textContent=new Date(D.month+'-15T12:00:00').toLocaleDateString(LANG==='ar'?'ar-EG-u-nu-latn':'en-GB',{month:'long',year:'numeric'});document.title='Rock Quad '+D.month;\n  document.getElementById('gen').textContent=t('generated','Generated')+' '+D.generated.slice(0,10)+' · '+t('rates','Rates')+': USD '+D.rates.USD+', EUR '+D.rates.EUR+' EGP';\n  document.getElementById('langBtn').textContent=LANG==='ar'?'English':'عربي';\n  document.getElementById('foot').textContent=D.example?t('foot','Made by the Rock Quad app. Example data for demonstration only.'):t('footReal','Made by the Rock Quad app.');\n}\nfunction draw(){statics();kpis();chart();cats();people();selects();table();trips();closes();}\ndocument.getElementById('q').oninput=e=>{F.q=e.target.value;LIMIT=60;table();};\ndocument.getElementById('fType').onchange=e=>{F.type=e.target.value;LIMIT=60;draw();};\ndocument.getElementById('fCat').onchange=e=>{F.cat=e.target.value;LIMIT=60;draw();};\ndocument.getElementById('fCur').onchange=e=>{F.cur=e.target.value;LIMIT=60;draw();};\ndocument.getElementById('more').onclick=()=>{LIMIT+=100;table();};\ndocument.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{SORT={k:th.dataset.k,asc:SORT.k===th.dataset.k?!SORT.asc:true};table();});\ndocument.getElementById('langBtn').onclick=()=>{LANG=LANG==='ar'?'en':'ar';draw();};\ndraw();\n})();\n<\/script>\n<\/body>\n<\/html>\n";
+const CUR=['EGP','USD','EUR'];
+const METHODS=['cash','instapay','ewallet'];
+const SLOTS=[['Sunrise','05:30'],['Morning','09:00'],['Sunset','15:30'],['Night','19:00']];
+const DEFAULTS={
+  lang:'ar',reportLang:'ar',emad:'',closer:'Abram',rates:{USD:48.5,EUR:52.5},
+  guides:['Salem','Hamada','Eid'],helpers:[],refs:['Hotel desk','Dive centre','Rep'],
+  routes:['Canyon','Bedouin village','Mountain','Lagoon'],
+  catsOut:['Fuel','Spare parts','Repairs & service','Guide fee','Helper fee','Commission','Camp & tea','Water & snacks','Bike wash','Permits & fees','Owner takes cash','Other'],
+  catsIn:['Opening cash','Other income']
+};
+const PERSON_CATS={'Guide fee':'guides','Helper fee':'helpers','Commission':'refs'};
+
+/* ---------- Arabic ---------- */
+const AR={
+  EGP:'جنيه',USD:'دولار',EUR:'يورو',cash:'كاش',instapay:'انستاباي',ewallet:'محفظة',
+  Sunrise:'الشروق',Morning:'الصباح',Sunset:'الغروب',Night:'الليل',Custom:'ميعاد آخر',
+  Canyon:'الكانيون','Bedouin village':'قرية بدوية',Mountain:'الجبل',Lagoon:'اللاجون',
+  Salem:'سالم',Hamada:'حمادة',Eid:'عيد','Walk-in':'مباشر','Hotel desk':'مكتب الفندق','Dive centre':'مركز غوص',Rep:'مندوب',
+  Fuel:'بنزين','Spare parts':'قطع غيار','Repairs & service':'صيانة وتصليح','Guide fee':'أجرة المرشد','Helper fee':'أجرة المساعد',Commission:'عمولة','Camp & tea':'الكامب والشاي','Water & snacks':'مياه وسناكس','Bike wash':'غسيل الباجي','Permits & fees':'تصاريح ورسوم','Owner takes cash':'سحب المالك',Other:'أخرى',
+  'Opening cash':'رصيد افتتاحي','Other income':'دخل آخر',
+  Today:'اليوم',Cash:'النقدية',Close:'التقفيل',More:'المزيد',
+  'Cash expected in box':'النقدية المتوقعة في الدرج','InstaPay & e-wallet today (not in the box)':'انستاباي والمحفظة اليوم (خارج الدرج)',
+  "Today's trips":'رحلات اليوم','No trips yet. Tap + Trip.':'لا توجد رحلات بعد. اضغط + رحلة.',
+  'Still owed by guests':'مبالغ متبقية على الضيوف','Owes':'غير مدفوع','+ Trip':'+ رحلة',
+  guests:'ضيوف',bikes:'باجي',ppl:'أفراد',single:'فردي',double:'مزدوج',
+  'Day closed 🔒':'تم تقفيل اليوم 🔒','Reopen day':'إعادة فتح اليوم','is not closed yet':'لم يُقفل بعد','Close it':'قفّله',
+  Guests:'الضيوف','Take payment':'تحصيل','No guests yet':'لا يوجد ضيوف بعد',Guide:'المرشد',Helper:'المساعد',
+  'Paid ':'تم دفع ','Not paid yet':'لم يُدفع بعد','Pay':'ادفع','+ Add guests':'+ إضافة ضيوف','‹ Back':'› رجوع',
+  'Trip costs':'تكاليف الرحلة','Edit trip':'تعديل الرحلة',
+  'Movements today':'حركات اليوم','No cash movements yet.':'لا توجد حركات بعد.','Guest payments are added automatically from trips.':'مدفوعات الضيوف تُضاف تلقائياً من الرحلات.',
+  'In today':'وارد اليوم','Out today':'منصرف اليوم','+ In / Out':'+ وارد / منصرف',
+  'Close day':'تقفيل اليوم','Count the cash box':'عُدّ الدرج',Expected:'المتوقع',OK:'تمام','Opening':'رصيد البداية',
+  'Not in the box':'خارج الدرج','Close day and make report':'تقفيل اليوم وعمل التقرير',
+  'Closing locks the day. You can reopen it later from Today.':'التقفيل يقفل اليوم. يمكن إعادة فتحه لاحقاً من شاشة اليوم.',
+  'Nothing to close yet.':'لا يوجد شيء للتقفيل بعد.',
+  Report:'التقرير','Send to Emad on WhatsApp':'إرسال لعماد على واتساب','Copy text':'نسخ النص','Copied':'تم النسخ','Sent ✓':'تم الإرسال ✓',
+  'Save backup file':'حفظ نسخة احتياطية','Restore from file':'استرجاع من ملف','Monthly report file':'ملف التقرير الشهري',
+  'Closed days':'الأيام المقفلة','No closed days yet.':'لا توجد أيام مقفلة بعد.',Settings:'الإعدادات','Owed to referrers':'مستحقات المندوبين',
+  'Backup & reports':'النسخ الاحتياطي والتقارير',
+  'New trip':'رحلة جديدة',Time:'الميعاد',Route:'المسار','None':'بدون','Save trip':'حفظ الرحلة','Delete trip':'حذف الرحلة',
+  'Add guests':'إضافة ضيوف','Edit guests':'تعديل الضيوف','Name or hotel (optional)':'الاسم أو الفندق (اختياري)',
+  People:'الأفراد','Single bikes':'باجي فردي','Double bikes':'باجي مزدوج','Total price':'السعر الإجمالي',Currency:'العملة',
+  'Paid by':'طريقة الدفع','Pays later':'يدفع لاحقاً','Referred by':'عن طريق','Commission (EGP)':'العمولة (جنيه)',
+  'Paid now':'دُفعت الآن','Owe later':'تُدفع لاحقاً',Note:'ملاحظة',Save:'حفظ',Delete:'حذف',Cancel:'إلغاء',
+  'Cash in / out':'وارد / منصرف','＋ In':'＋ وارد','− Out':'− منصرف','What for':'البند',Amount:'المبلغ','Enter an amount':'اكتب المبلغ','Enter the price':'اكتب السعر',
+  'Who':'لمن','Receipt photo':'صورة الإيصال','📷 Add photo':'📷 إضافة صورة','Remove photo':'إزالة الصورة',
+  'Saved':'تم الحفظ','Deleted':'تم الحذف','Delete this entry?':'حذف هذا القيد؟','Delete this trip and its guests?':'حذف الرحلة وكل ضيوفها؟',
+  'Reopen this day? The report already sent will not change.':'إعادة فتح اليوم؟ التقرير الذي تم إرساله لن يتغير.',
+  'Language':'اللغة','Report language':'لغة التقرير',Both:'الاثنين',"Emad's WhatsApp number":'رقم واتساب عماد','Closed by (name)':'التقفيل بواسطة (الاسم)',
+  'Exchange rates (EGP)':'أسعار الصرف (بالجنيه)','Guides':'المرشدين','Helpers':'المساعدين','Referrers (hotels, reps, dive centres)':'المندوبين (فنادق، مندوبين، مراكز غوص)',
+  'Routes':'المسارات','Expense types':'أنواع المصروفات','One per line':'سطر لكل اسم','Save settings':'حفظ الإعدادات',
+  'Welcome to Rock Quad':'أهلاً في روك كواد','Set up once. You can change all of this later in Settings.':'إعداد لمرة واحدة. يمكنك تغيير كل ذلك لاحقاً من الإعدادات.',
+  'Cash in the box now':'النقدية في الدرج الآن','Start':'ابدأ',
+  'Add Emad\'s WhatsApp number in Settings first.':'أضف رقم واتساب عماد في الإعدادات أولاً.',
+  'Pick a month':'اختر الشهر','Make and share the file':'إنشاء ومشاركة الملف','Includes every trip, payment, expense and cash count. It is also a full backup of the month.':'يحتوي على كل رحلة ودفعة ومصروف وجرد. وهو أيضاً نسخة احتياطية كاملة للشهر.',
+  'Backup restored':'تم استرجاع النسخة','Month data added':'تمت إضافة بيانات الشهر','This file is not a Rock Quad backup.':'هذا الملف ليس نسخة احتياطية من روك كواد.',
+  'Replace all data on this phone with this backup?':'استبدال كل البيانات على هذا الهاتف بهذه النسخة؟',
+  'Last backup':'آخر نسخة احتياطية','never':'أبداً','Install tip':'نصيحة التثبيت',
+  'Open this page in Safari, tap Share, then Add to Home Screen. Always open the app from its icon.':'افتح الصفحة في سفاري، اضغط مشاركة ثم "إضافة إلى الشاشة الرئيسية". افتح التطبيق دائماً من الأيقونة.',
+  'Storage':'التخزين','entries':'قيد','Version':'الإصدار','Nothing owed.':'لا توجد مستحقات.',
+  'Payment recorded':'تم التحصيل','Take payment now':'تحصيل الآن','Confirm':'تأكيد','closed':'مقفل','sent':'تم الإرسال','not sent':'لم يُرسل',
+  'Paid to':'دُفع إلى','reopened':'أُعيد فتحه','Day':'اليوم','Edit entry':'تعديل القيد','Time (24h)':'الوقت'
+};
+let S;               // whole saved state
+let U={view:'today',trip:null,sheet:null,toast:null,modal:null,reportDay:null,month:null};
+const L=()=>S&&S.settings?S.settings.lang:'ar';
+const t=(s,lang)=>((lang||L())==='ar'&&AR[s]!=null)?AR[s]:s;
+const fmt=n=>(Math.round(n*100)/100).toLocaleString('en-US');
+const money=(c,n,lang)=>(lang||L())==='ar'?fmt(n)+' '+t(c,'ar'):c+' '+fmt(n);
+const zero=()=>({EGP:0,USD:0,EUR:0});
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const pad=n=>String(n).padStart(2,'0');
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+const nowTime=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());};
+const dayLabel=(d,lang)=>new Date(d+'T12:00:00').toLocaleDateString((lang||L())==='ar'?'ar-EG-u-nu-latn':'en-GB',{weekday:'long',day:'numeric',month:'long'});
+const curLine=(o,lang)=>CUR.filter(c=>o[c]).map(c=>money(c,o[c],lang)).join(' · ')||'0';
+
+/* ---------- storage: IndexedDB, localStorage fallback ---------- */
+const store={
+  db:null,lsOk:false,
+  async open(){
+    try{localStorage.setItem('rq_t','1');localStorage.removeItem('rq_t');this.lsOk=true;}catch(e){}
+    return new Promise(res=>{let done=false;const fin=v=>{if(!done){done=true;res(v)}};
+      setTimeout(()=>fin(false),2000); // Safari can leave indexedDB.open hanging: never wait longer than this
+      try{const r=indexedDB.open('rockquad',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');
+        r.onsuccess=()=>{this.db=r.result;fin(true)};r.onerror=()=>fin(false);r.onblocked=()=>fin(false);}catch(e){fin(false)}});},
+  async get(){
+    let v=null;
+    if(this.db){v=await new Promise(res=>{let done=false;const fin=x=>{if(!done){done=true;res(x)}};setTimeout(()=>fin(null),2000);
+      try{const q=this.db.transaction('kv').objectStore('kv').get('state');q.onsuccess=()=>fin(q.result||null);q.onerror=()=>fin(null);}catch(e){fin(null)}});}
+    if(v)return v;
+    try{return JSON.parse(localStorage.getItem('rockquad')||'null')}catch(e){return null}},
+  async put(v){const json=JSON.stringify(v);
+    try{localStorage.setItem('rockquad',json)}catch(e){}
+    if(this.db){await new Promise(res=>{setTimeout(res,3000);try{const tx=this.db.transaction('kv','readwrite');tx.objectStore('kv').put(JSON.parse(json),'state');tx.oncomplete=res;tx.onerror=res;tx.onabort=res;}catch(e){res()}});}
+  },
+  canSave(){return !!(this.db||this.lsOk);}
+};
+let saveTimer=null;
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>store.put(S),150);}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&S){clearTimeout(saveTimer);store.put(S);}});
+
+/* ---------- money maths ---------- */
+const tripOf=id=>S.trips.find(x=>x.id===id);
+const closeOf=d=>S.closes.find(c=>c.day===d&&!c.reopened);
+const isClosed=d=>!!closeOf(d);
+function openingFor(day){
+  const prev=S.closes.filter(c=>c.day<day&&!c.reopened).sort((a,b)=>a.day<b.day?1:-1)[0];
+  return prev?{...prev.counted}:{...S.startCash};
+}
+function dayFigures(day){
+  const cashIn=zero(),cashOut=zero(),dig={instapay:zero(),ewallet:zero()},digOut={instapay:zero(),ewallet:zero()},guestIn=zero(),outCat={};
+  let guests=0,bikes=0;const trips=S.trips.filter(x=>x.day===day);
+  S.groups.forEach(g=>{const tr=tripOf(g.trip);if(tr&&tr.day===day){guests+=g.people;bikes+=g.single+g.double;}
+    if(g.paidDay===day){guestIn[g.cur]+=g.total;if(g.method==='cash')cashIn[g.cur]+=g.total;else dig[g.method][g.cur]+=g.total;}});
+  S.cash.filter(c=>c.day===day).forEach(c=>{
+    if(c.dir==='in'){if(c.method==='cash')cashIn[c.cur]+=c.amt;else dig[c.method][c.cur]+=c.amt;}
+    else{if(c.method==='cash')cashOut[c.cur]+=c.amt;else digOut[c.method][c.cur]+=c.amt;
+      outCat[c.cat]=outCat[c.cat]||zero();outCat[c.cat][c.cur]+=c.amt;}});
+  const opening=openingFor(day),exp=zero();CUR.forEach(c=>exp[c]=(opening[c]||0)+cashIn[c]-cashOut[c]);
+  return {trips,guests,bikes,cashIn,cashOut,dig,digOut,guestIn,outCat,opening,exp};
+}
+const owedGroups=()=>S.groups.filter(g=>!g.paidDay);
+const owedComms=()=>S.groups.filter(g=>g.comm>0&&!g.commPaid);
+function activeDays(){const s=new Set();S.trips.forEach(x=>s.add(x.day));S.cash.forEach(c=>s.add(c.day));S.groups.forEach(g=>g.paidDay&&s.add(g.paidDay));return [...s].sort();}
+function unclosedPast(){const td=today();return activeDays().filter(d=>d<td&&!isClosed(d));}
+
+/* ---------- daily report text ---------- */
+function reportText(day,lang){
+  const F=dayFigures(day),c=closeOf(day)||S.closes.filter(x=>x.day===day).slice(-1)[0];const ar=lang==='ar';const T=s=>t(s,lang);const M=(o)=>curLine(o,lang);
+  const sumObj=(...os)=>{const r=zero();os.forEach(o=>CUR.forEach(k=>r[k]+=o[k]));return r;};
+  let s=(ar?'🏍️ روك كواد · التقرير اليومي\n':'🏍️ Rock Quad · Daily report\n')+dayLabel(day,lang)+'\n\n';
+  s+=(ar?'الرحلات: ':'Trips: ')+F.trips.length+(F.trips.length?' ('+F.trips.map(x=>T(x.slot)).join(ar?'، ':', ')+')':'')+'\n';
+  s+=(ar?'الضيوف: ':'Guests: ')+F.guests+(ar?' · الباجي: ':' · Bikes: ')+F.bikes+'\n\n';
+  s+=(ar?'💵 وارد كاش: ':'💵 Cash in: ')+M(F.cashIn)+'\n';
+  const ip=F.dig.instapay,ew=F.dig.ewallet;
+  if(CUR.some(k=>ip[k]))s+=(ar?'📲 انستاباي: ':'📲 InstaPay: ')+M(ip)+'\n';
+  if(CUR.some(k=>ew[k]))s+=(ar?'📱 محفظة: ':'📱 E-wallet: ')+M(ew)+'\n';
+  const allOut=sumObj(F.cashOut,F.digOut.instapay,F.digOut.ewallet);
+  s+=(ar?'\n💸 المنصرف: ':'\n💸 Money out: ')+M(allOut)+'\n';
+  Object.keys(F.outCat).forEach(k=>{s+='  • '+T(k)+': '+M(F.outCat[k])+'\n';});
+  if(c){const d=zero();CUR.forEach(k=>d[k]=(c.counted[k]||0)-(c.expected[k]||0));
+    s+=(ar?'\n📦 المتوقع في الدرج: ':'\n📦 Expected in box: ')+M(c.expected)+'\n';
+    s+=(ar?'✅ المعدود: ':'✅ Counted: ')+M(c.counted)+'\n';
+    s+=(ar?'الفرق: ':'Difference: ')+(CUR.every(k=>!d[k])?(ar?'لا يوجد':'none'):CUR.filter(k=>d[k]).map(k=>(d[k]>0?'+':'−')+money(k,Math.abs(d[k]),lang)).join(' · '))+'\n';}
+  else s+=(ar?'\n📦 المتوقع في الدرج: ':'\n📦 Expected in box: ')+M(F.exp)+'\n';
+  const ow=owedGroups();if(ow.length){const o=zero();ow.forEach(g=>o[g.cur]+=g.total);s+=(ar?'\n⏳ مبالغ متبقية على الضيوف: ':'\n⏳ Still owed by guests: ')+M(o)+' ('+ow.length+')\n';}
+  const oc=owedComms();if(oc.length){s+=(ar?'🤝 عمولات مستحقة: ':'🤝 Commissions owed: ')+money('EGP',oc.reduce((a,g)=>a+g.comm,0),lang)+'\n';}
+  if(c)s+=(ar?'\nالتقفيل بواسطة: ':'\nClosed by: ')+c.closedBy+' · '+c.closedAt;
+  return s;
+}
+function fullReport(day){const r=S.settings.reportLang;return r==='both'?reportText(day,'ar')+'\n\n———\n\n'+reportText(day,'en'):reportText(day,r);}
+
+/* ---------- small DOM helper ---------- */
+function h(tag,attrs,...kids){const e=document.createElement(tag);
+  for(const k in (attrs||{})){const v=attrs[k];if(v==null||v===false)continue;if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(k==='value')e.value=v;else e.setAttribute(k,v===true?'':v);}
+  kids.flat(9).forEach(k=>{if(k==null||k===false)return;e.append(k.nodeType?k:document.createTextNode(k))});return e;}
+const app=document.getElementById('app');
+function go(v,extra){U={...U,view:v,sheet:null,...(extra||{})};render();app.querySelector('.body')&&(app.querySelector('.body').scrollTop=0);}
+function toast(m){U.toast=m;render();clearTimeout(toast.t);toast.t=setTimeout(()=>{U.toast=null;render()},2300);}
+function ask(msg,ok){U.modal={msg,ok};render();}
+function head(title,sub,back,act){return h('div',{class:'head'},act||null,back?h('button',{class:'back',onclick:back},t('‹ Back')):null,h('div',{class:'t'},title),sub?h('div',{class:'s'},sub):null);}
+function langBtn(){return h('button',{class:'act',onclick:()=>{S.settings.lang=L()==='ar'?'en':'ar';save();render();}},L()==='ar'?'EN':'ع');}
+function tabbar(){const tabs=[['today','🏠','Today'],['cash','💵','Cash'],['close','🔒','Close'],['more','☰','More']];
+  const on=v=>U.view===v||(v==='today'&&U.view==='trip')||(v==='close'&&U.view==='report')||(v==='more'&&['settings','month'].includes(U.view));
+  return h('div',{class:'tabbar'},tabs.map(([v,i,l])=>h('button',{class:on(v)?'on':'',onclick:()=>go(v)},h('span',{class:'i'},i),t(l))));}
+function chips(list,val,set,label){return h('div',{class:'chips'},list.map(x=>h('button',{class:'chip'+(x===val?' on':''),onclick:()=>{set(x);render()}},label?label(x):t(x))));}
+function stepper(v,set,min){return h('div',{class:'stepper'},h('button',{onclick:()=>{set(Math.max(min||0,v-1));render()}},'−'),h('span',null,v),h('button',{onclick:()=>{set(v+1);render()}},'+'));}
+function moneyBox(lbl,o){return h('div',{class:'box'},h('div',{class:'lbl'},t(lbl)),h('div',{class:'money'},CUR.map(c=>h('div',null,h('small',null,t(c)),h('b',null,fmt(o[c]||0))))));}
+const methodPill=g=>!g.paidDay?h('span',{class:'pill due'},t('Owes')):h('span',{class:'pill '+(g.method==='cash'?'ok':'dig')},t(g.method));
+const num=v=>{let x=String(v==null?'':v).trim().replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/٬/g,',').replace(/٫/g,'.').replace(/\s/g,'');
+  if(/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(x))x=x.replace(/,/g,'');else x=x.replace(/,/g,'.');
+  const n=parseFloat(x);return isFinite(n)?n:0;};
+
+/* ---------- views ---------- */
+function vSetup(){
+  const s=U.setup||(U.setup={lang:S.settings.lang,closer:S.settings.closer,emad:'',cash:{EGP:'',USD:'',EUR:''}});
+  return [head(t('Welcome to Rock Quad'),t('Set up once. You can change all of this later in Settings.'),null,langBtn()),
+    h('div',{class:'body',style:'padding-bottom:40px'},
+      h('div',{class:'field'},h('label',null,t('Language')),h('div',{class:'seg'},
+        h('button',{class:L()==='ar'?'on':'',onclick:()=>{S.settings.lang='ar';render()}},'عربي'),h('button',{class:L()==='en'?'on':'',onclick:()=>{S.settings.lang='en';render()}},'English'))),
+      h('div',{class:'field'},h('label',null,t('Closed by (name)')),h('input',{class:'inp',value:s.closer,oninput:e=>s.closer=e.target.value})),
+      h('div',{class:'field'},h('label',null,t("Emad's WhatsApp number")),h('input',{class:'inp',type:'tel',dir:'ltr',placeholder:'+20…',value:s.emad,oninput:e=>s.emad=e.target.value})),
+      h('div',{class:'field'},h('label',null,t('Cash in the box now')),h('div',{class:'flexrow'},CUR.map(c=>h('div',{style:'flex:1;min-width:90px'},h('div',{class:'d'},t(c)),
+        h('input',{class:'inp',inputmode:'decimal',dir:'ltr',placeholder:'0',value:s.cash[c],oninput:e=>s.cash[c]=e.target.value}))))),
+      h('button',{class:'btn pri',onclick:()=>{S.settings.closer=s.closer.trim()||'Abram';S.settings.emad=s.emad.trim();
+        S.startCash={EGP:num(s.cash.EGP),USD:num(s.cash.USD),EUR:num(s.cash.EUR)};S.setupDone=true;save();U.setup=null;go('today');}},t('Start')),
+      h('div',{class:'banner warn',style:'margin-top:16px'},h('b',null,t('Install tip')+': '),t('Open this page in Safari, tap Share, then Add to Home Screen. Always open the app from its icon.')))];
+}
+function vToday(){
+  const day=today(),F=dayFigures(day),closed=isClosed(day);const past=unclosedPast();
+  const digTotal=zero();METHODS.slice(1).forEach(m=>CUR.forEach(c=>digTotal[c]+=F.dig[m][c]));
+  const ow=owedGroups();
+  return [head(t('Today'),dayLabel(day),null,langBtn()),
+    h('div',{class:'body'},
+      !store.canSave()?h('div',{class:'banner warn'},L()==='ar'?'⚠️ لا يمكن حفظ البيانات في هذا العرض. افتح التطبيق من أيقونة الشاشة الرئيسية في سفاري.':'⚠️ Data cannot be saved in this view. Open the app from its Home Screen icon in Safari.'):null,
+      past.map(d=>h('div',{class:'banner warn',onclick:()=>go('close',{closeDay:d}),style:'cursor:pointer'},dayLabel(d)+' '+t('is not closed yet')+' · ',h('u',null,t('Close it')))),
+      closed?h('div',{class:'banner okb',style:'display:flex;justify-content:space-between;align-items:center'},t('Day closed 🔒'),
+        h('button',{class:'btn sec2 sm',onclick:()=>ask(t('Reopen this day? The report already sent will not change.'),()=>{closeOf(day).reopened=new Date().toISOString();save();render();})},t('Reopen day'))):null,
+      moneyBox('Cash expected in box',F.exp),
+      CUR.some(c=>digTotal[c])?h('div',{class:'box'},h('div',{class:'lbl'},t('InstaPay & e-wallet today (not in the box)')),h('div',{class:'amt',style:'direction:inherit'},curLine(digTotal))):null,
+      h('div',{class:'sec'},t("Today's trips")),
+      F.trips.length?F.trips.sort((a,b)=>a.time<b.time?-1:1).map(tr=>{const gs=S.groups.filter(g=>g.trip===tr.id);const due=gs.some(g=>!g.paidDay);
+        return h('div',{class:'item',onclick:()=>go('trip',{trip:tr.id})},
+          h('div',null,h('div',{class:'n'},tr.time+' · '+t(tr.slot)),h('div',{class:'d'},[t(tr.route),t(tr.guide),gs.reduce((a,g)=>a+g.people,0)+' '+t('guests'),gs.reduce((a,g)=>a+g.single+g.double,0)+' '+t('bikes')].filter(Boolean).join(' · '))),
+          gs.length?h('span',{class:'pill '+(due?'due':'ok')},due?t('Owes'):'✓'):null);}):h('div',{class:'d',style:'padding:6px 2px'},t('No trips yet. Tap + Trip.')),
+      ow.length?[h('div',{class:'sec'},t('Still owed by guests')),ow.map(g=>{const tr=tripOf(g.trip);return h('div',{class:'item',onclick:()=>{U.sheet={type:'pay',g:g.id,method:'cash'};render();}},
+        h('div',null,h('div',{class:'n'},g.name||t('Guests')),h('div',{class:'d'},tr?dayLabel(tr.day)+' · '+t(tr.slot):'')),h('span',{class:'amt out'},money(g.cur,g.total)));})]:null),
+    closed?null:h('button',{class:'fab',onclick:()=>{U.sheet={type:'trip',slot:'Sunset',time:'15:30',route:S.settings.routes[0]||'',guide:S.settings.guides[0]||'',helper:''};render()}},t('+ Trip'))];
+}
+function vTrip(){
+  const tr=tripOf(U.trip);if(!tr){return vToday();}
+  const closed=isClosed(tr.day);const gs=S.groups.filter(g=>g.trip===tr.id);
+  const fees=S.cash.filter(c=>c.trip===tr.id);
+  const paidTo=name=>fees.filter(c=>c.person===name&&(c.cat==='Guide fee'||c.cat==='Helper fee')).reduce((a,c)=>a+c.amt,0);
+  const person=(role,name,cat)=>name?h('div',{class:'row'},h('div',null,h('div',{class:'lbl',style:'margin:0'},t(role)),h('div',{style:'font-weight:700'},t(name)),
+      h('div',{class:'d'},paidTo(name)?t('Paid ')+money('EGP',paidTo(name)):t('Not paid yet'))),
+    closed?null:h('button',{class:'btn sec2 sm',onclick:()=>{U.sheet={type:'cash',dir:'out',cat,amt:'',cur:'EGP',method:'cash',person:name,trip:tr.id,note:'',day:tr.day};render();}},t('Pay'))):null;
+  const costs=zero();fees.filter(c=>c.dir==='out').forEach(c=>costs[c.cur]+=c.amt);
+  return [head(t(tr.slot)+' · '+t(tr.route),dayLabel(tr.day)+' · '+tr.time,()=>go('today'),closed?null:h('button',{class:'act',onclick:()=>{U.sheet={type:'trip',edit:tr.id,...tr};render();}},t('Edit trip'))),
+    h('div',{class:'body'},
+      h('div',{class:'box'},h('div',{class:'lbl'},t('Guests')),
+        gs.length?gs.map(g=>h('div',{class:'row',onclick:()=>{if(!closed){U.sheet={type:'group',edit:g.id,...g,total:String(g.total),comm:g.comm?String(g.comm):'',pay:g.paidDay?g.method:'later'};render();}},style:'cursor:pointer'},
+          h('div',{style:'min-width:0'},h('div',{style:'font-weight:700'},g.name||t('Guests')),
+            h('div',{class:'d'},g.people+' '+t('ppl')+(g.single?' · '+g.single+' '+t('single'):'')+(g.double?' · '+g.double+' '+t('double'):'')+(g.ref&&g.ref!=='Walk-in'?' · '+t(g.ref)+(g.comm?' ('+fmt(g.comm)+')':''):''))),
+          h('div',{style:'text-align:end'},h('div',{class:'amt'},money(g.cur,g.total)),
+            g.paidDay?methodPill(g):h('button',{class:'btn pri sm',onclick:e=>{e.stopPropagation();U.sheet={type:'pay',g:g.id,method:'cash'};render();}},t('Take payment'))))
+        ):h('div',{class:'d',style:'padding:8px 0'},t('No guests yet'))),
+      h('div',{class:'box'},person('Guide',tr.guide,'Guide fee'),person('Helper',tr.helper,'Helper fee')),
+      CUR.some(c=>costs[c])?h('div',{class:'box'},h('div',{class:'lbl'},t('Trip costs')),h('div',{class:'amt out',style:'direction:inherit'},curLine(costs)),
+        fees.map(c=>h('div',{class:'d'},t(c.cat)+(c.person?' · '+t(c.person):'')+' · '+money(c.cur,c.amt)))):null,
+      closed?null:h('button',{class:'btn pri',onclick:()=>{U.sheet={type:'group',trip:tr.id,name:'',people:2,single:2,double:0,total:'',cur:'EGP',pay:'cash',ref:'Walk-in',comm:'',commPaid:true,note:''};render()}},t('+ Add guests')))];
+}
+function vCash(){
+  const day=today(),F=dayFigures(day),closed=isClosed(day);
+  const list=S.cash.filter(c=>c.day===day).sort((a,b)=>a.time<b.time?1:-1);
+  const totIn=zero(),totOut=zero();list.forEach(c=>(c.dir==='in'?totIn:totOut)[c.cur]+=c.amt);CUR.forEach(c=>totIn[c]+=F.guestIn[c]);
+  return [head(t('Cash'),dayLabel(day),null,langBtn()),
+    h('div',{class:'body'},
+      h('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px'},
+        h('div',{class:'box',style:'margin:0'},h('div',{class:'lbl'},t('In today')),h('div',{class:'in',style:'font-weight:800'},curLine(totIn))),
+        h('div',{class:'box',style:'margin:0'},h('div',{class:'lbl'},t('Out today')),h('div',{class:'out',style:'font-weight:800'},curLine(totOut)))),
+      h('div',{class:'box'},h('div',{class:'lbl'},t('Movements today')),
+        list.length?list.map(c=>h('div',{class:'row',style:'cursor:pointer',onclick:()=>{if(!closed){U.sheet={type:'cash',edit:c.id,...c,amt:String(c.amt)};render();}}},
+          h('div',{style:'min-width:0'},h('div',{style:'font-weight:700'},t(c.cat)+(c.person?' · '+t(c.person):'')+(c.photo?' 📷':'')),h('div',{class:'d'},c.time+(c.method!=='cash'?' · '+t(c.method):'')+(c.note?' · '+c.note:''))),
+          h('div',{class:'amt '+(c.dir==='in'?'in':'out')},(c.dir==='in'?'+':'−')+money(c.cur,c.amt)))):h('div',{class:'d',style:'padding:6px 0'},t('No cash movements yet.')),
+        h('div',{class:'hint'},t('Guest payments are added automatically from trips.')))),
+    closed?null:h('button',{class:'fab',onclick:()=>{U.sheet={type:'cash',dir:'out',cat:'Fuel',amt:'',cur:'EGP',method:'cash',person:'',note:''};render()}},t('+ In / Out'))];
+}
+function vClose(){
+  const past=unclosedPast();const day=U.closeDay&&!isClosed(U.closeDay)?U.closeDay:(past[0]||today());
+  if(isClosed(day))return [head(t('Close day'),dayLabel(day),null,langBtn()),h('div',{class:'body'},h('div',{class:'banner okb'},t('Day closed 🔒')),h('button',{class:'btn pri',onclick:()=>go('report',{reportDay:day})},t('Report')))];
+  const F=dayFigures(day);
+  if(!U.count||U.count.day!==day)U.count={day,v:{EGP:String(F.exp.EGP),USD:String(F.exp.USD),EUR:String(F.exp.EUR)}};
+  const dig=zero();CUR.forEach(c=>dig[c]=F.dig.instapay[c]+F.dig.ewallet[c]);
+  return [head(t('Close day'),dayLabel(day),null,langBtn()),
+    h('div',{class:'body'},
+      h('div',{class:'box'},h('div',{class:'lbl'},t('Count the cash box')),
+        CUR.map(c=>{const d=num(U.count.v[c])-F.exp[c];
+          return h('div',{class:'countrow'},h('div',{style:'flex:1'},h('div',{style:'font-weight:800'},t(c)),h('div',{class:'d'},t('Expected')+' '+fmt(F.exp[c]))),
+            h('input',{class:'inp',inputmode:'decimal',value:U.count.v[c],oninput:e=>{U.count.v[c]=e.target.value;},onchange:()=>render()}),
+            h('span',{class:d?'diffx':'diff0',style:'width:62px;text-align:end;direction:ltr'},d?(d>0?'+':'')+fmt(d):t('OK')));})),
+      CUR.some(c=>dig[c])?h('div',{class:'box'},h('div',{class:'lbl'},t('Not in the box')),
+        ['instapay','ewallet'].map(m=>CUR.some(c=>F.dig[m][c])?h('div',{class:'row'},h('span',null,t(m)),h('span',{class:'amt'},curLine(F.dig[m]))):null)):null,
+      h('button',{class:'btn pri',onclick:()=>{
+        const counted={};CUR.forEach(c=>counted[c]=num(U.count.v[c]));
+        S.closes.push({day,opening:F.opening,expected:F.exp,counted,digital:F.dig,closedBy:S.settings.closer,closedAt:nowTime(),at:new Date().toISOString(),sentAt:null});
+        save();U.count=null;go('report',{reportDay:day});}},t('Close day and make report')),
+      h('div',{class:'hint',style:'text-align:center'},t('Closing locks the day. You can reopen it later from Today.')))];
+}
+function vReport(){
+  const day=U.reportDay;const c=closeOf(day);const txt=fullReport(day);
+  return [head(t('Report'),dayLabel(day),()=>go('more')),
+    h('div',{class:'body'},
+      h('div',{class:'wabubble'},txt),
+      h('button',{class:'btn wa',onclick:()=>{const n=(S.settings.emad||'').replace(/[^0-9]/g,'');if(!n){toast(t("Add Emad's WhatsApp number in Settings first."));return;}
+        if(c){c.sentAt=new Date().toISOString();save();}location.href='https://wa.me/'+n+'?text='+encodeURIComponent(txt);}},t('Send to Emad on WhatsApp')+(c&&c.sentAt?'  ✓':'')),
+      h('button',{class:'btn sec2',onclick:()=>{navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast(t('Copied')),()=>{});}},t('Copy text')),
+      h('button',{class:'btn sec2',onclick:backup},t('Save backup file')))];
+}
+function vMore(){
+  const closes=S.closes.filter(c=>!c.reopened).sort((a,b)=>a.day<b.day?1:-1);
+  const oc=owedComms();const byRef={};oc.forEach(g=>{byRef[g.ref]=(byRef[g.ref]||0)+g.comm;});
+  return [head(t('More'),'Rock Quad',null,langBtn()),
+    h('div',{class:'body'},
+      h('div',{class:'sec'},t('Backup & reports')),
+      h('button',{class:'btn sec2',onclick:()=>go('month')},'📊 '+t('Monthly report file')),
+      h('button',{class:'btn sec2',onclick:backup},'💾 '+t('Save backup file')),
+      h('button',{class:'btn sec2',onclick:()=>document.getElementById('restoreIn').click()},'♻️ '+t('Restore from file')),
+      h('div',{class:'hint'},t('Last backup')+': '+(S.lastBackup?new Date(S.lastBackup).toLocaleString():t('never'))),
+      h('div',{class:'sec'},t('Owed to referrers')),
+      h('div',{class:'box'},Object.keys(byRef).length?Object.keys(byRef).map(r=>h('div',{class:'row'},h('span',{style:'font-weight:700'},t(r)),
+        h('div',{style:'display:flex;gap:8px;align-items:center'},h('span',{class:'amt'},money('EGP',byRef[r])),
+          h('button',{class:'btn pri sm',onclick:()=>{if(isClosed(today()))return;const amt=byRef[r];
+            S.cash.push({id:uid(),day:today(),time:nowTime(),dir:'out',cat:'Commission',amt,cur:'EGP',method:'cash',person:r,note:'',trip:null});
+            oc.filter(g=>g.ref===r).forEach(g=>g.commPaid=today());save();toast(t('Paid to')+' '+t(r));}},t('Pay'))))):h('div',{class:'d'},t('Nothing owed.'))),
+      h('div',{class:'sec'},t('Closed days')),
+      h('div',{class:'box'},closes.length?closes.slice(0,60).map(c=>h('div',{class:'row',style:'cursor:pointer',onclick:()=>go('report',{reportDay:c.day})},
+        h('div',null,h('div',{style:'font-weight:700'},dayLabel(c.day)),h('div',{class:'d'},t('Closed by (name)').split(' (')[0]+': '+c.closedBy+' · '+c.closedAt)),
+        h('span',{class:'pill '+(c.sentAt?'ok':'due')},c.sentAt?t('sent'):t('not sent')))):h('div',{class:'d'},t('No closed days yet.'))),
+      h('button',{class:'btn sec2',onclick:()=>go('settings')},'⚙️ '+t('Settings')),
+      h('div',{class:'hint',style:'text-align:center;margin-top:14px'},t('Version')+' '+VERSION+' · '+(S.trips.length+S.groups.length+S.cash.length)+' '+t('entries')))];
+}
+function vMonth(){
+  const months=[...new Set(activeDays().map(d=>d.slice(0,7)))].sort().reverse();if(!months.length)months.push(today().slice(0,7));
+  const m=U.month&&months.includes(U.month)?U.month:months[0];
+  const mlabel=x=>new Date(x+'-15T12:00:00').toLocaleDateString(L()==='ar'?'ar-EG-u-nu-latn':'en-GB',{month:'long',year:'numeric'});
+  return [head(t('Monthly report file'),'',()=>go('more')),
+    h('div',{class:'body'},
+      h('div',{class:'field'},h('label',null,t('Pick a month')),chips(months,m,v=>U.month=v,mlabel)),
+      h('div',{class:'hint',style:'margin-bottom:6px'},t('Includes every trip, payment, expense and cash count. It is also a full backup of the month.')),
+      h('button',{class:'btn pri',onclick:()=>monthFile(m)},t('Make and share the file')))];
+}
+function vSettings(){
+  const st=U.st||(U.st={...S.settings,rates:{...S.settings.rates},guidesT:S.settings.guides.join('\n'),helpersT:S.settings.helpers.join('\n'),refsT:S.settings.refs.join('\n'),routesT:S.settings.routes.join('\n'),catsT:S.settings.catsOut.join('\n')});
+  const ta=(label,key)=>h('div',{class:'field'},h('label',null,t(label)+' · '+t('One per line')),h('textarea',{class:'inp',value:st[key],oninput:e=>st[key]=e.target.value}));
+  const lines=s=>s.split('\n').map(x=>x.trim()).filter(Boolean);
+  const est=JSON.stringify(S).length;
+  return [head(t('Settings'),'',()=>{U.st=null;go('more');}),
+    h('div',{class:'body'},
+      h('div',{class:'field'},h('label',null,t('Language')),h('div',{class:'seg'},
+        h('button',{class:L()==='ar'?'on':'',onclick:()=>{S.settings.lang='ar';st.lang='ar';save();render()}},'عربي'),h('button',{class:L()==='en'?'on':'',onclick:()=>{S.settings.lang='en';st.lang='en';save();render()}},'English'))),
+      h('div',{class:'field'},h('label',null,t('Report language')),h('div',{class:'seg'},[['ar','عربي'],['en','English'],['both',t('Both')]].map(([v,l])=>h('button',{class:st.reportLang===v?'on':'',onclick:()=>{st.reportLang=v;render()}},l)))),
+      h('div',{class:'field'},h('label',null,t("Emad's WhatsApp number")),h('input',{class:'inp',type:'tel',dir:'ltr',placeholder:'+20…',value:st.emad,oninput:e=>st.emad=e.target.value})),
+      h('div',{class:'field'},h('label',null,t('Closed by (name)')),h('input',{class:'inp',value:st.closer,oninput:e=>st.closer=e.target.value})),
+      h('div',{class:'field'},h('label',null,t('Exchange rates (EGP)')),h('div',{class:'flexrow'},['USD','EUR'].map(c=>h('div',{style:'flex:1'},h('div',{class:'d'},'1 '+t(c)),h('input',{class:'inp',inputmode:'decimal',dir:'ltr',value:st.rates[c],oninput:e=>st.rates[c]=e.target.value}))))),
+      ta('Guides','guidesT'),ta('Helpers','helpersT'),ta('Referrers (hotels, reps, dive centres)','refsT'),ta('Routes','routesT'),ta('Expense types','catsT'),
+      h('button',{class:'btn pri',onclick:()=>{Object.assign(S.settings,{reportLang:st.reportLang,emad:st.emad.trim(),closer:st.closer.trim()||'Abram',
+        rates:{USD:num(st.rates.USD)||S.settings.rates.USD,EUR:num(st.rates.EUR)||S.settings.rates.EUR},guides:lines(st.guidesT),helpers:lines(st.helpersT),refs:lines(st.refsT),routes:lines(st.routesT),catsOut:lines(st.catsT)});
+        save();U.st=null;toast(t('Saved'));go('more');}},t('Save settings')),
+      h('div',{class:'hint'},t('Storage')+': '+(est/1024).toFixed(0)+' KB'))];
+}
+
+/* ---------- sheets ---------- */
+function sheet(){
+  const s=U.sheet;if(!s)return null;let inner=[];
+  const close=()=>{U.sheet=null;render();};
+  if(s.type==='trip'){
+    inner=[h('h4',null,t(s.edit?'Edit trip':'New trip')),
+      h('div',{class:'field'},h('label',null,t('Time')),chips(SLOTS.map(x=>x[0]).concat('Custom'),s.slot,v=>{s.slot=v;const f=SLOTS.find(x=>x[0]===v);if(f)s.time=f[1];})),
+      h('div',{class:'field'},h('input',{class:'inp',type:'time',value:s.time,oninput:e=>s.time=e.target.value})),
+      h('div',{class:'field'},h('label',null,t('Route')),chips(S.settings.routes,s.route,v=>s.route=v)),
+      h('div',{class:'field'},h('label',null,t('Guide')),chips(S.settings.guides,s.guide,v=>s.guide=v)),
+      S.settings.helpers.length?h('div',{class:'field'},h('label',null,t('Helper')),chips([''].concat(S.settings.helpers),s.helper||'',v=>s.helper=v,x=>x?t(x):t('None'))):null,
+      h('button',{class:'btn pri',onclick:()=>{
+        if(s.edit){Object.assign(tripOf(s.edit),{slot:s.slot,time:s.time,route:s.route,guide:s.guide,helper:s.helper||''});save();close();return;}
+        const id=uid();S.trips.push({id,day:today(),slot:s.slot,time:s.time,route:s.route,guide:s.guide,helper:s.helper||'',note:''});save();go('trip',{trip:id});}},t('Save trip')),
+      s.edit?h('button',{class:'btn danger',onclick:()=>ask(t('Delete this trip and its guests?'),()=>{S.groups=S.groups.filter(g=>g.trip!==s.edit);S.cash=S.cash.filter(c=>c.trip!==s.edit);S.trips=S.trips.filter(x=>x.id!==s.edit);save();go('today');toast(t('Deleted'));})},t('Delete trip')):null];
+  }else if(s.type==='group'){
+    const refs=['Walk-in'].concat(S.settings.refs);
+    inner=[h('h4',null,t(s.edit?'Edit guests':'Add guests')),
+      h('div',{class:'field'},h('label',null,t('Name or hotel (optional)')),h('input',{class:'inp',value:s.name,oninput:e=>s.name=e.target.value})),
+      h('div',{class:'flexrow'},
+        h('div',{class:'field'},h('label',null,t('People')),stepper(s.people,v=>s.people=v,1)),
+        h('div',{class:'field'},h('label',null,t('Single bikes')),stepper(s.single,v=>s.single=v)),
+        h('div',{class:'field'},h('label',null,t('Double bikes')),stepper(s.double,v=>s.double=v))),
+      h('div',{class:'field'},h('label',null,t('Total price')),h('input',{class:'inp big',inputmode:'decimal',placeholder:'0',value:s.total,oninput:e=>s.total=e.target.value})),
+      h('div',{class:'field'},h('label',null,t('Currency')),chips(CUR,s.cur,v=>s.cur=v)),
+      h('div',{class:'field'},h('label',null,t('Paid by')),chips(METHODS.concat('later'),s.pay,v=>s.pay=v,x=>x==='later'?t('Pays later'):t(x))),
+      h('div',{class:'field'},h('label',null,t('Referred by')),chips(refs,s.ref,v=>s.ref=v)),
+      s.ref!=='Walk-in'?h('div',{class:'field'},h('label',null,t('Commission (EGP)')),
+        h('input',{class:'inp',inputmode:'decimal',dir:'ltr',placeholder:'0',value:s.comm,oninput:e=>s.comm=e.target.value}),
+        h('div',{class:'seg',style:'margin-top:8px'},h('button',{class:s.commPaid?'on':'',onclick:()=>{s.commPaid=true;render()}},t('Paid now')),h('button',{class:!s.commPaid?'on':'',onclick:()=>{s.commPaid=false;render()}},t('Owe later')))):null,
+      h('div',{class:'field'},h('label',null,t('Note')),h('input',{class:'inp',value:s.note||'',oninput:e=>s.note=e.target.value})),
+      h('button',{class:'btn pri',onclick:()=>{
+        const total=num(s.total);if(!total){toast(t('Enter the price'));return;}
+        const tr=tripOf(s.trip);const comm=s.ref!=='Walk-in'?num(s.comm):0;
+        let g=s.edit?S.groups.find(x=>x.id===s.edit):null;const wasPaid=g&&g.paidDay;
+        const data={trip:s.trip,name:s.name.trim(),people:s.people,single:s.single,double:s.double,total,cur:s.cur,ref:s.ref,comm,note:s.note||''};
+        if(s.pay==='later'){data.method=null;data.paidDay=null;data.paidTime=null;}
+        else{data.method=s.pay;data.paidDay=wasPaid||today();data.paidTime=(g&&g.paidTime)||nowTime();}
+        if(!g){g={id:uid(),time:nowTime(),commPaid:false};S.groups.push(g);}
+        Object.assign(g,data);
+        // commission paid on the spot = cash out linked to this group
+        S.cash=S.cash.filter(c=>c.group!==g.id);
+        if(comm>0&&s.commPaid){S.cash.push({id:uid(),day:tr.day,time:nowTime(),dir:'out',cat:'Commission',amt:comm,cur:'EGP',method:'cash',person:s.ref,note:g.name,trip:tr.id,group:g.id});g.commPaid=tr.day;}
+        else g.commPaid=comm>0?false:g.commPaid;
+        save();U.sheet=null;toast(t('Saved')+' · '+money(s.cur,total));}},t('Save')),
+      s.edit?h('button',{class:'btn danger',onclick:()=>ask(t('Delete this entry?'),()=>{S.groups=S.groups.filter(x=>x.id!==s.edit);S.cash=S.cash.filter(c=>c.group!==s.edit);save();U.sheet=null;toast(t('Deleted'));})},t('Delete')):null];
+  }else if(s.type==='pay'){
+    const g=S.groups.find(x=>x.id===s.g);
+    inner=[h('h4',null,t('Take payment now')),h('div',{style:'font-weight:700;margin-bottom:4px'},g.name||t('Guests')),h('div',{class:'amt',style:'font-size:24px;margin-bottom:12px;direction:inherit'},money(g.cur,g.total)),
+      h('div',{class:'field'},h('label',null,t('Paid by')),chips(METHODS,s.method,v=>s.method=v)),
+      h('button',{class:'btn pri',onclick:()=>{if(isClosed(today()))return;g.method=s.method;g.paidDay=today();g.paidTime=nowTime();save();U.sheet=null;toast(t('Payment recorded'));}},t('Confirm'))];
+  }else if(s.type==='cash'){
+    const cats=s.dir==='out'?S.settings.catsOut:DEFAULTS.catsIn;const plist=PERSON_CATS[s.cat]?S.settings[PERSON_CATS[s.cat]]:null;
+    inner=[h('h4',null,t(s.edit?'Edit entry':'Cash in / out')),
+      h('div',{class:'field'},h('div',{class:'seg'},h('button',{class:s.dir==='in'?'on in':'',onclick:()=>{s.dir='in';s.cat=DEFAULTS.catsIn[1];render()}},t('＋ In')),h('button',{class:s.dir==='out'?'on out':'',onclick:()=>{s.dir='out';s.cat=S.settings.catsOut[0];render()}},t('− Out')))),
+      h('div',{class:'field'},h('label',null,t('What for')),chips(cats,s.cat,v=>{s.cat=v;s.person='';})),
+      plist&&plist.length?h('div',{class:'field'},h('label',null,t('Who')),chips(plist,s.person,v=>s.person=v)):null,
+      h('div',{class:'field'},h('label',null,t('Amount')),h('input',{class:'inp big',inputmode:'decimal',placeholder:'0',value:s.amt,oninput:e=>s.amt=e.target.value})),
+      h('div',{class:'field'},h('label',null,t('Currency')),chips(CUR,s.cur,v=>s.cur=v)),
+      h('div',{class:'field'},h('label',null,t('Paid by')),chips(METHODS,s.method,v=>s.method=v)),
+      h('div',{class:'field'},h('label',null,t('Note')),h('input',{class:'inp',value:s.note||'',placeholder:s.cat==='Spare parts'?(L()==='ar'?'مثلاً: تيل فرامل، باجي 4':'e.g. brake pads, bike 4'):'',oninput:e=>s.note=e.target.value})),
+      s.dir==='out'?h('div',{class:'field'},h('label',null,t('Receipt photo')),
+        s.photo?[h('img',{class:'photo',src:s.photo}),h('button',{class:'btn sec2 sm',style:'margin-top:8px',onclick:()=>{s.photo=null;render();}},t('Remove photo'))]
+          :h('button',{class:'btn sec2 sm',onclick:()=>document.getElementById('photoIn').click()},t('📷 Add photo'))):null,
+      h('button',{class:'btn pri',onclick:()=>{const a=num(s.amt);if(!a){toast(t('Enter an amount'));return;}
+        const data={dir:s.dir,cat:s.cat,amt:a,cur:s.cur,method:s.method,person:s.person||'',note:(s.note||'').trim(),photo:s.dir==='out'?(s.photo||null):null,trip:s.trip||null};
+        if(s.edit)Object.assign(S.cash.find(c=>c.id===s.edit),data);else S.cash.push({id:uid(),day:s.day||today(),time:nowTime(),...data});
+        save();U.sheet=null;toast(t('Saved')+' · '+money(s.cur,a));}},t('Save')),
+      s.edit?h('button',{class:'btn danger',onclick:()=>ask(t('Delete this entry?'),()=>{S.cash=S.cash.filter(c=>c.id!==s.edit);save();U.sheet=null;toast(t('Deleted'));})},t('Delete')):null];
+  }
+  return h('div',{class:'overlay',onclick:e=>{if(e.target===e.currentTarget)close();}},h('div',{class:'sheet'},h('div',{class:'grab'}),inner));
+}
+function modal(){const m=U.modal;if(!m)return null;
+  return h('div',{class:'modal'},h('div',{class:'c'},h('p',null,m.msg),
+    h('button',{class:'btn pri',onclick:()=>{U.modal=null;m.ok();render();}},t('Confirm')),h('button',{class:'btn sec2',onclick:()=>{U.modal=null;render();}},t('Cancel'))));}
+
+/* ---------- photos ---------- */
+document.getElementById('photoIn').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(!f||!U.sheet)return;
+  const img=new Image();const url=URL.createObjectURL(f);img.onload=()=>{const max=1000,k=Math.min(1,max/Math.max(img.width,img.height));
+    const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(url);U.sheet.photo=c.toDataURL('image/jpeg',0.6);render();};img.src=url;});
+
+/* ---------- files: share or download ---------- */
+async function shareFile(name,text,type){
+  const file=new File([text],name,{type});
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return true;}}catch(e){if(e&&e.name==='AbortError')return false;}
+  const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},3000);return true;
+}
+async function backup(){const name='rock-quad-backup-'+today()+'.json';
+  const ok=await shareFile(name,JSON.stringify({app:'rock-quad-ledger',kind:'full-backup',schema:1,at:new Date().toISOString(),state:S}),'application/json');
+  if(ok){S.lastBackup=new Date().toISOString();save();render();}}
+function monthData(m){
+  const inM=d=>d&&d.slice(0,7)===m;
+  const trips=S.trips.filter(x=>inM(x.day));const tids=new Set(trips.map(x=>x.id));
+  const groups=S.groups.filter(g=>tids.has(g.trip)||inM(g.paidDay));
+  groups.forEach(g=>{if(!tids.has(g.trip)){const tr=tripOf(g.trip);if(tr){trips.push(tr);tids.add(tr.id);}}});
+  return {app:'rock-quad-ledger',kind:'month',schema:1,business:'Rock Quad',month:m,generated:new Date().toISOString(),lang:L(),rates:S.settings.rates,
+    trips,groups,cash:S.cash.filter(c=>inM(c.day)),closes:S.closes.filter(c=>inM(c.day)&&!c.reopened)};
+}
+async function monthFile(m){
+  try{const tpl=REPORT_TPL;
+    const json=JSON.stringify(monthData(m)).replace(/</g,'\\u003c');
+    await shareFile('rock-quad-'+m+'.html',tpl.replace('/*DATA*/',()=>json),'text/html');}
+  catch(e){toast('Error: '+e.message);}
+}
+document.getElementById('restoreIn').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  let txt=await f.text(),d=null;
+  try{if(/^\s*</.test(txt)){const m=txt.match(/<script type="application\/json" id="ledger-data">([\s\S]*?)<\/script>/);d=m&&JSON.parse(m[1]);}else d=JSON.parse(txt);}catch(err){d=null;}
+  if(!d||d.app!=='rock-quad-ledger'){toast(t('This file is not a Rock Quad backup.'));return;}
+  if(d.kind==='full-backup'){ask(t('Replace all data on this phone with this backup?'),()=>{S=migrate(d.state);save();toast(t('Backup restored'));go('today');});return;}
+  // month file: add anything this phone does not have yet
+  const add=(arr,items,key)=>{const have=new Set(arr.map(x=>x[key]));items.forEach(x=>{if(!have.has(x[key]))arr.push(x);});};
+  add(S.trips,d.trips||[],'id');add(S.groups,d.groups||[],'id');add(S.cash,d.cash||[],'id');add(S.closes,d.closes||[],'day');
+  save();toast(t('Month data added'));render();
+});
+
+/* ---------- boot ---------- */
+function migrate(st){st=st||{};st.v=1;st.settings={...DEFAULTS,...(st.settings||{})};st.settings.rates={...DEFAULTS.rates,...(st.settings.rates||{})};
+  ['trips','groups','cash','closes'].forEach(k=>st[k]=st[k]||[]);st.startCash=st.startCash||zero();return st;}
+function render(){
+  const b=app.querySelector('.body');const y=b?b.scrollTop:0;const sh=app.querySelector('.sheet');const sy=sh?sh.scrollTop:0;
+  const ae=document.activeElement;const focusKey=ae&&ae.tagName==='INPUT'?[...app.querySelectorAll('input,textarea')].indexOf(ae):-1;
+  document.documentElement.lang=L();document.documentElement.dir=L()==='ar'?'rtl':'ltr';
+  const views={today:vToday,trip:vTrip,cash:vCash,close:vClose,report:vReport,more:vMore,month:vMonth,settings:vSettings};
+  const v=S.setupDone?(views[U.view]||vToday)():vSetup();
+  app.replaceChildren(...v,S.setupDone?tabbar():null,sheet(),modal(),U.toast?h('div',{class:'toast'},U.toast):null);
+  const nb=app.querySelector('.body');if(nb)nb.scrollTop=y;const ns=app.querySelector('.sheet');if(ns&&sh)ns.scrollTop=sy;
+}
+(async()=>{
+  await store.open();S=migrate(await store.get());
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
+  render();
+  if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+})();
+})();
+</script>
+</body>
+</html>
